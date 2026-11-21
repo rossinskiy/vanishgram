@@ -11,7 +11,7 @@
     "test": "node --test test/*.test.ts"
   },
   "dependencies": {
-    "@hpke/hybridkem-x-wing": "^0.7.0",
+    "@hpke/hybridkem-x-wing": "^0.7.1",
     "@noble/ciphers": "^2.0.0",
     "@noble/curves": "^2.0.0",
     "@noble/hashes": "^2.0.0",
