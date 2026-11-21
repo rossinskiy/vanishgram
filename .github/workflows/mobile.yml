@@ -21,6 +21,8 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - name: Install the NDK (strips the native library)
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null; "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;28.2.13676358"
       - run: npm ci
       - run: npm run build -w @vanishgram/web
       - run: npm run sync:android -w @vanishgram/mobile

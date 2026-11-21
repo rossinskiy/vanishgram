@@ -17,6 +17,13 @@ android {
             ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    // Debug symbols are stripped from the native library; this needs the NDK pinned here (installed by the workflow).
+    ndkVersion "28.2.13676358"
+    packaging {
+        // libsignal ships test-only libraries and desktop builds next to the phone ones; none of that belongs in the app.
+        jniLibs { excludes += ['**/libsignal_jni_testing.so'] }
+        resources { excludes += ['**/*.dylib', '**/*.dll', '**/libsignal_jni_amd64.so', '**/libsignal_jni_aarch64.so', '**/libsignal_jni_testing*'] }
+    }
     compileOptions {
         // libsignal uses java.time and friends, which older Android versions lack
         coreLibraryDesugaringEnabled true
