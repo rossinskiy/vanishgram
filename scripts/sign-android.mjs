@@ -6,6 +6,7 @@ import { execFileSync } from 'node:child_process';
 import { join, basename } from 'node:path';
 import { homedir, tmpdir } from 'node:os';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 
 const [src, out] = process.argv.slice(2);
 if (!src || !out) { console.error('usage: node scripts/sign-android.mjs <artifacts-folder> <output-folder>'); process.exit(2); }
@@ -25,12 +26,16 @@ const outAab = join(out, `Vanishgram-${version}.aab`);
 await copyFile(aab, outAab);
 execFileSync('jarsigner', ['-sigalg', 'SHA256withRSA', '-digestalg', 'SHA-256', '-keystore', ks, '-storepass', password, outAab, alias], { stdio: 'inherit' });
 
-// 2. the APK: v2/v3 signature through Google's apksig library, fetched once from Maven Central
+// 2. the APK: v2/v3 signature through Google's apksig library, fetched once from Google's Maven repository
 const tools = join(dir, 'tools'); await mkdir(tools, { recursive: true });
 const jar = join(tools, 'apksig-8.13.0.jar');
 try { await access(jar); } catch {
-  const r = await fetch('https://repo1.maven.org/maven2/com/android/tools/build/apksig/8.13.0/apksig-8.13.0.jar');
-  if (!r.ok) throw new Error('could not download apksig'); await writeFile(jar, Buffer.from(await r.arrayBuffer()));
+  const r = await fetch('https://dl.google.com/dl/android/maven2/com/android/tools/build/apksig/8.13.0/apksig-8.13.0.jar');
+  if (!r.ok) throw new Error('could not download apksig');
+  const buf = Buffer.from(await r.arrayBuffer());
+  // pinned: the sha256 Google publishes next to the file
+  if (createHash('sha256').update(buf).digest('hex') !== 'c070ed1394629d74641aa0906f60b2ffa1ee77e6366a1f93437f59717b1aeb89') throw new Error('apksig checksum mismatch');
+  await writeFile(jar, buf);
 }
 const outApk = join(out, `Vanishgram-${version}.apk`);
 execFileSync('java', ['-cp', jar, new URL('./android/ApkSign.java', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'), ks, alias, apk, outApk], { stdio: 'inherit', env: { ...process.env, VG_KEYSTORE_PASSWORD: password } });
