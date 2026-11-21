@@ -75,3 +75,37 @@ jobs:
           name: vanishgram-ios
           path: apps/mobile/ios/App/Vanishgram-*.ipa
           if-no-files-found: error
+  android-test:
+    # Runs the app in an emulator and drives the native libsignal engine from the page.
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Install the NDK
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses >/dev/null; "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;28.2.13676358"
+      - run: npm ci
+      - run: npm run build -w @vanishgram/web
+      - run: npm run sync:android -w @vanishgram/mobile
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          arch: x86_64
+          script: cd apps/mobile/android && ./gradlew --no-daemon connectedDebugAndroidTest
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: android-test-report
+          path: apps/mobile/android/app/build/reports/androidTests
