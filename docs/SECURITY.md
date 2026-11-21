@@ -18,6 +18,10 @@ Abuse handling works from metadata only: sending rates, how many different peopl
 
 CI runs type checks, the full test suite, `npm audit --omit=dev` (fails on high severity) and CodeQL on every push; Dependabot proposes weekly updates. Status when this file was written: 0 known vulnerabilities in production dependencies.
 
+## Source code
+
+The client source is public at https://github.com/rossinskiy/vanishgram. The installers on the website are built by GitHub Actions from that repository (workflow `desktop`). The server is closed source and is deliberately not trusted with message content.
+
 ## Desktop app
 
 Installers are currently unsigned. Verify the SHA-256 shown on the website before running one. The app loads its interface from inside the installer; the server cannot replace it. Report problems privately, as above.

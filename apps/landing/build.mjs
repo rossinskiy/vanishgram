@@ -14,7 +14,7 @@ await cp('src/landing.css', 'dist/landing.css'); await cp('src/landing.js', 'dis
 
 const PLATFORMS = [
   { os: 'win', title: 'Windows', re: /^Vanishgram-([\d.]+)-win-x64\.exe$/, note: 'Windows 10 or later, 64-bit' },
-  { os: 'mac', title: 'macOS', re: /^Vanishgram-([\d.]+)-mac-(?:arm64|x64|universal)\.dmg$/, note: 'macOS 12 or later' },
+  { os: 'mac', title: 'macOS', re: /^Vanishgram-([\d.]+)-mac-(?:arm64|x64|universal)\.dmg$/, note: 'macOS 12 or later, Apple Silicon (M1 or newer)' },
   { os: 'linux', title: 'Linux', re: /^Vanishgram-([\d.]+)-linux-x86_64\.AppImage$/, note: 'Any recent 64-bit distribution (AppImage)' },
 ];
 const found = [];
