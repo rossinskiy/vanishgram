@@ -103,8 +103,10 @@ jobs:
         with:
           api-level: 33
           arch: x86_64
+          profile: pixel_6
           script: |
-            cd apps/mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest :app:installDebug
+            cd apps/mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest
+            cd apps/mobile/android && ./gradlew --no-daemon :app:installDebug
             adb shell am start -n win.karatel.vanishgram/.MainActivity
             sleep 20
             adb exec-out screencap -p > "$GITHUB_WORKSPACE/screen-login.png"
