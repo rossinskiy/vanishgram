@@ -16,6 +16,8 @@ const PLATFORMS = [
   { os: 'win', title: 'Windows', re: /^Vanishgram-([\d.]+)-win-x64\.exe$/, note: 'Windows 10 or later, 64-bit' },
   { os: 'mac', title: 'macOS', re: /^Vanishgram-([\d.]+)-mac-(arm64|x64)\.dmg$/, note: 'macOS 12 or later', multi: true },
   { os: 'linux', title: 'Linux', re: /^Vanishgram-([\d.]+)-linux-x86_64\.AppImage$/, note: 'Any recent 64-bit distribution (AppImage)' },
+  { os: 'android', title: 'Android', re: /^Vanishgram-([\d.]+)\.apk$/, note: 'Android 7 or later. Installs from the file; a Google Play listing is coming', button: 'Download APK' },
+  { os: 'ios', title: 'iPhone and iPad', re: /^Vanishgram-([\d.]+)-unsigned\.ipa$/, note: 'iOS 15 or later. Not in the App Store yet: install with Sideloadly or AltStore, see below', button: 'Download .ipa' },
 ];
 const found = [];
 for (const d of dirs) for (const f of await readdir(d).catch(() => [])) {
@@ -47,7 +49,7 @@ for (const p of PLATFORMS) {
   await writeFile(join('dist-downloads', f.name), buf);
   manifest.push({ os: p.os, name: f.name, version: f.version, size, sha256: sha }); version = f.version;
   cards.push(`<div class="dl" data-os="${p.os}"><h3>${p.title}</h3><p class="meta">${esc(p.note)} &middot; version ${esc(f.version)} &middot; ${mb(size)}</p>`
-    + `<a class="btn" href="/download/${esc(f.name)}" download>Download for ${p.title}</a>`
+    + `<a class="btn" href="/download/${esc(f.name)}" download>${p.button ?? `Download for ${p.title}`}</a>`
     + `<span class="fine">SHA-256</span><code>${sha}</code><button class="btn ghost copy" type="button" data-copy="${sha}">Copy checksum</button></div>`);
 }
 await writeFile('dist-downloads/Vanishgram-manifest.json', JSON.stringify({ files: manifest }, null, 2));

@@ -27,7 +27,9 @@ public class BridgeTest {
 
     private static final String SCRIPT = String.join("\n",
         "(async () => {",
-        "  const b = window.vgSignal; if (!b) return { error: 'no bridge' };",
+        "  const b = window.vgSignal;",
+        "  if (!b) return { error: 'no bridge', cap: typeof window.Capacitor, native: !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()),",
+        "    reg: !!(window.Capacitor && window.Capacitor.registerPlugin), ui: document.getElementById('root') ? document.getElementById('root').innerHTML.slice(0, 200) : 'no root', href: location.href, scripts: document.scripts.length };",
         "  const a = await b.open(), c = await b.open();",
         "  await b.call(a, 'create', []); await b.call(c, 'create', []);",
         "  const bundle = async (h) => ({ identityKey: await b.call(h, 'identityKey', []), registrationId: await b.call(h, 'registrationId', []),",
