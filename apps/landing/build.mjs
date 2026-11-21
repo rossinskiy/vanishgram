@@ -16,7 +16,7 @@ const PLATFORMS = [
   { os: 'win', title: 'Windows', re: /^Vanishgram-([\d.]+)-win-x64\.exe$/, note: 'Windows 10 or later, 64-bit' },
   { os: 'mac', title: 'macOS', re: /^Vanishgram-([\d.]+)-mac-(arm64|x64)\.dmg$/, note: 'macOS 12 or later', multi: true },
   { os: 'linux', title: 'Linux', re: /^Vanishgram-([\d.]+)-linux-x86_64\.AppImage$/, note: 'Any recent 64-bit distribution (AppImage)' },
-  { os: 'android', title: 'Android', re: /^Vanishgram-([\d.]+)\.apk$/, note: 'Android 7 or later. Installs from the file; a Google Play listing is coming', button: 'Download APK' },
+  { os: 'android', title: 'Android', re: /^Vanishgram-([\d.]+)\.apk$/, note: 'Android 7 or later. Installs from the file; allow installs from your browser when Android asks', button: 'Download APK' },
   { os: 'ios', title: 'iPhone and iPad', re: /^Vanishgram-([\d.]+)-unsigned\.ipa$/, note: 'iOS 15 or later. Not in the App Store yet: install with Sideloadly or AltStore, see below', button: 'Download .ipa' },
 ];
 const found = [];

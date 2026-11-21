@@ -1,6 +1,6 @@
 name: mobile
 # Builds the phone apps. Nothing is signed here: signing keys live on the maintainer's computer, never in CI.
-# Run from the Actions tab (workflow_dispatch) or push a tag like v0.1.1.
+# Run from the Actions tab (workflow_dispatch) or push a tag like v0.1.2.
 on:
   workflow_dispatch:
   push:
