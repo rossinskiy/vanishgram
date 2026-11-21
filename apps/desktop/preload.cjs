@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld('vgSignal', {
 });
 contextBridge.exposeInMainWorld('vgDesktop', {
   info: () => ipcRenderer.invoke('vg:info'),
+  /** Called with { state: 'ready', version } when a verified update has been downloaded. */
+  onUpdate: (cb) => { if (typeof cb === 'function') ipcRenderer.on('vg:update', (_e, m) => { if (m && m.state === 'ready' && typeof m.version === 'string') cb({ state: 'ready', version: m.version }); }); },
+  installUpdate: () => ipcRenderer.invoke('vg:install-update'),
   /** Called with a "#join=..." or "#channel=..." fragment when a vanishgram:// link is opened. */
   onLink: (cb) => { if (typeof cb === 'function') ipcRenderer.on('vg:link', (_e, frag) => { if (typeof frag === 'string') cb(frag); }); },
 });

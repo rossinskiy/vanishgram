@@ -33,6 +33,8 @@ export class MlsGroups {
   private dirty = new Set<string>();
   private bundleCache = new Map<string, { at: number; list: PrekeyBundleWire[] }>();
   private asked = new Map<string, number>();
+  /** devices that told the group they lost their keys: removed and added again in the next commit */
+  private resync = new Map<string, Set<string>>();
   readonly cfg: ReturnType<typeof M.clientConfig>;
 
   constructor(c: VanishClient, host: MlsHost) {
@@ -109,8 +111,9 @@ export class MlsGroups {
     for (const a of roster) {
       try { want.set(a, new Map((await this.bundles(a, true)).map((b) => [b.deviceId, b]))); } catch { this.scheduleReconcile(gid, 5000); return; }
     }
-    const removes = members.filter((m) => !(m.account === myAcct && m.device === myDev) && !want.get(m.account)?.has(m.device)).map((m) => m.leaf);
-    const have = new Set(members.map((m) => `${m.account}:${m.device}`));
+    const lost = this.resync.get(gid) ?? new Set<string>();
+    const removes = members.filter((m) => !(m.account === myAcct && m.device === myDev) && (!want.get(m.account)?.has(m.device) || lost.has(`${m.account}:${m.device}`))).map((m) => m.leaf);
+    const have = new Set(members.filter((m) => !lost.has(`${m.account}:${m.device}`)).map((m) => `${m.account}:${m.device}`));
     const adds: Uint8Array[] = [], targets: { toAccount: string; toDevice: string }[] = [];
     for (const [account, devs] of want) {
       const missing = [...devs.keys()].filter((d) => !have.has(`${account}:${d}`));
@@ -138,7 +141,21 @@ export class MlsGroups {
       throw e;
     }
     this.adopt(gid, r.state); M.release(r.consumed);
+    this.resync.delete(gid);
     this.afterChange(gid);
+  }
+
+  noteResync(gid: string, account: string, device: string) {
+    if (account === this.c.account.accountId && device === this.c.device.deviceId) return; // that is me asking
+    const set = this.resync.get(gid) ?? new Set<string>(); set.add(`${account}:${device}`); this.resync.set(gid, set);
+  }
+
+  /** This device could not follow the group any more (a commit failed to apply). Drop its state and ask to be replaced. */
+  async recover(gid: string) {
+    this.forget(gid); this.asked.delete(gid);
+    this.c.onError(new Error('group keys lost on this device: asking the group to add it again'));
+    await this.c.http('POST', `/v1/groups/${gid}/hello`, { resync: true }).catch(() => {});
+    this.host.touch();
   }
 
   /** A device that is in a group's roster but has no keys for it asks the others to add it. */
@@ -203,7 +220,10 @@ export class MlsGroups {
       if (!M.membersOf(r.state).some((m) => m.account === this.c.account.accountId && m.device === this.c.device.deviceId)) { this.forget(gid); this.host.touch(); return; }
       this.afterChange(gid);
       this.scheduleReconcile(gid);
-    } catch (e) { this.c.onError(e); }
+    } catch (e) {
+      this.c.onError(e);
+      if (!/policy/.test(String((e as Error)?.message))) await this.recover(gid); // a refused commit is the policy working; anything else means we fell out of step
+    }
   }
 
   /** Returns false when the keys for this message have not arrived yet (it is kept and retried). */

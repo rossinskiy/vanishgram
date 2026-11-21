@@ -1,7 +1,7 @@
 {
   "name": "@vanishgram/desktop",
   "productName": "Vanishgram",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Vanishgram desktop messenger",
   "author": "Vanishgram contributors",
   "homepage": "https://vanishgram.karatel.win",
@@ -14,7 +14,9 @@
     "dist": "npm run prepare-app && electron-builder",
     "dist:win": "npm run prepare-app && electron-builder --win",
     "dist:linux": "npm run prepare-app && electron-builder --linux",
-    "dist:mac": "npm run prepare-app && electron-builder --mac"
+    "dist:mac": "npm run prepare-app && electron-builder --mac --arm64",
+    "dist:mac:x64": "npm run prepare-app && electron-builder --mac --x64",
+    "test": "node --test test/*.test.ts"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.2",
@@ -34,6 +36,9 @@
     "files": [
       "main.cjs",
       "preload.cjs",
+      "updater.cjs",
+      "release-verify.cjs",
+      "update-key.cjs",
       "signal-engine.mjs",
       "app/**",
       "build/icon.png",
@@ -84,10 +89,17 @@
     ],
     "asarUnpack": [
       "**/node_modules/@signalapp/**"
+    ],
+    "publish": [
+      {
+        "provider": "generic",
+        "url": "https://vanishgram.karatel.win/updates/"
+      }
     ]
   },
   "desktopName": "vanishgram.desktop",
   "dependencies": {
-    "@signalapp/libsignal-client": "0.108.5"
+    "@signalapp/libsignal-client": "0.108.5",
+    "electron-updater": "6.8.11"
   }
 }

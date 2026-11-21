@@ -95,7 +95,14 @@ function adopt(c: VanishClient) {
 }
 
 // Desktop app: a vanishgram:// link was opened. Show it in the active account (the link keeps its secret in the fragment only).
-declare global { interface Window { vgDesktop?: { onLink(cb: (frag: string) => void): void } } }
+declare global { interface Window { vgDesktop?: { onLink(cb: (frag: string) => void): void; onUpdate?(cb: (m: { state: 'ready'; version: string }) => void): void; installUpdate?(): Promise<void> } } }
+// A verified update was downloaded in the background: offer to restart into it.
+window.vgDesktop?.onUpdate?.((m) => {
+  const bar = h('div', { class: 'notice-bar', role: 'status' }, h('span', {}, `Vanishgram ${m.version} is ready.`),
+    h('button', { class: 'btn', type: 'button', onClick: () => { void window.vgDesktop?.installUpdate?.(); } }, 'Restart and update'),
+    h('button', { class: 'btn secondary', type: 'button', onClick: () => bar.remove() }, 'Later'));
+  document.body.prepend(bar);
+});
 window.vgDesktop?.onLink((frag) => { pending = 'https://vanishgram.karatel.win/' + frag; if (activeId) show(activeId); });
 
 function show(id: string) {

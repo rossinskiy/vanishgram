@@ -17,6 +17,7 @@ import { FileManager, type PendingUpload } from './files-client.ts';
 import type { FileInfo, ChatPrefs } from '@vanishgram/protocol';
 import { ExtrasManager, emptyPrefs } from './extras-client.ts';
 import { TwoFactorManager, opaqueLogin, type SecondFactorHook } from './twofa-client.ts';
+import { HistoryManager } from './history-client.ts';
 
 interface Snapshot {
   /** v2: libsignal. v1 (our own ratchet) cannot be read any more: such a vault keeps its chats but gets a new device identity. */
@@ -89,6 +90,9 @@ export class VanishClient {
   private sweepTimer: ReturnType<typeof setInterval> | null = null;
   pendingUploads = new Map<string, PendingUpload>();
   readonly tf: TwoFactorManager;
+  readonly history: HistoryManager;
+  /** True on a device that has just signed in with the phrase: the app offers to copy the history from another device. */
+  wantHistory = false;
   /** ids of incoming messages I already sent a read receipt for, and accounts I blocked */
   receipted = new Set<string>();
   blockedSet = new Set<string>();
@@ -110,6 +114,7 @@ export class VanishClient {
     this.files = new FileManager(this);
     this.x = new ExtrasManager(this);
     this.tf = new TwoFactorManager(this);
+    this.history = new HistoryManager(this);
   }
 
   // ---------- encrypted persistence ----------
@@ -216,6 +221,7 @@ export class VanishClient {
   static async recover(baseUrl: string, mnemonic: string, hook?: SecondFactorHook): Promise<VanishClient> {
     const c = new VanishClient(baseUrl, deriveAccount(mnemonic), await createDevice());
     await c.signIn(hook);
+    c.wantHistory = true;
     return c;
   }
 
@@ -386,6 +392,7 @@ export class VanishClient {
       if (mine) { for (const m of mine) if (env.ids.includes(m.id) && m.from === this.account.accountId) m.read = true; this.onChange(); this.flushSoon(); }
       return;
     }
+    if (env.t === 'history-request' || env.t === 'history') { await this.history.onEnvelope(from, fromDevice, env); return; }
     if (env.t.startsWith('call-')) { await this.calls.onSignal(from, fromDevice, env as any); return; }
     if (env.t === 'sender-key' || env.t === 'group-meta') { await this.gm.onPairwise(from, fromDevice, env); return; }
     if (env.t === 'file') {

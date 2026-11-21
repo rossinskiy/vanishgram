@@ -2,6 +2,7 @@ export * from './encoding.ts';
 export * from './account.ts';
 export * from './device.ts';
 export * from './signal.ts';
+export type { HistoryRequest } from './history-client.ts';
 export * from './client.ts';
 export * from './vault.ts';
 export * from './serialize.ts';

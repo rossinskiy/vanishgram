@@ -108,6 +108,9 @@ app.whenReady().then(() => {
   });
   app.on('web-contents-created', (_e, wc) => wc.on('did-start-navigation', (_ev, _url, _inPlace, isMainFrame) => { if (isMainFrame) engines.clear(); })); // a reload starts with fresh engines
 
+  const updater = require('./updater.cjs').start((msg) => { if (win && !win.isDestroyed()) win.webContents.send('vg:update', msg); });
+  ipcMain.handle('vg:install-update', (e) => { if (e.senderFrame && e.senderFrame.url.startsWith(APP_ORIGIN + '/')) updater.install(); });
+
   ipcMain.handle('vg:info', () => ({ version: app.getVersion(), platform: process.platform }));
   createWindow();
   app.on('activate', () => { if (BrowserWindow.getAllWindows().length === 0) createWindow(); });

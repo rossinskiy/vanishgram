@@ -64,6 +64,9 @@ export type Envelope =
   | { t: 'react'; target: string; emoji: string | null; ts: number; chat?: string }
   | { t: 'ttl'; seconds: number; ts: number; chat?: string }
   | { t: 'prefs'; prefs: ChatPrefs; ts: number }
+  /** A new device of the same account asks an older one for the chat history; the older one answers with an encrypted file. */
+  | { t: 'history-request'; ts: number }
+  | { t: 'history'; file: FileInfo; to: string; ts: number }
   | { t: 'file'; id: string; file: FileInfo; body?: string; replyTo?: string; ts: number; fwd?: string }
   | { t: 'call-offer'; callId: string; sdp: string; ts: number }
   | { t: 'call-answer'; callId: string; sdp: string }

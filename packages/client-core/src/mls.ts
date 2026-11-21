@@ -126,6 +126,9 @@ export function commitPolicy(p: Policy): IncomingMessageCallback {
     if (incoming.kind !== 'commit') return 'reject'; // standalone proposals are not used: every change is a commit
     const sender = incoming.senderLeafIndex === undefined ? null : p.memberAt(Number(incoming.senderLeafIndex));
     if (!sender) return 'reject';
+    // a device that lost its keys is replaced: its old leaf may go if the same commit adds the same device again
+    const readded = new Set<string>();
+    for (const { proposal } of incoming.proposals) if ((proposal as { proposalType: string }).proposalType === 'add') { const id = identityOf((proposal as any).add.keyPackage.leafNode.credential); if (id) readded.add(`${id.account}:${id.device}`); }
     for (const { proposal } of incoming.proposals) {
       const t = (proposal as { proposalType: string }).proposalType;
       if (t === 'add') {
@@ -134,7 +137,7 @@ export function commitPolicy(p: Policy): IncomingMessageCallback {
       } else if (t === 'remove') {
         const target = p.memberAt(Number((proposal as any).remove.removed));
         // only devices that are gone: signed out, or belonging to an account the server removed (or the committer's own devices)
-        if (target && target.account !== sender.account && p.roster().has(target.account) && p.deviceActive(target.account, target.device)) return 'reject';
+        if (target && target.account !== sender.account && p.roster().has(target.account) && p.deviceActive(target.account, target.device) && !readded.has(`${target.account}:${target.device}`)) return 'reject';
       } else if (t === 'group_context_extensions') {
         if (!p.isAdmin(sender.account)) return 'reject'; // only admins rename the group
       } else return 'reject';

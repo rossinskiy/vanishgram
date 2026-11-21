@@ -128,9 +128,10 @@ export class GroupManager {
     });
   }
 
-  onEvent(f: { id: string; groupId: string }) {
+  onEvent(f: { id: string; groupId: string; resync?: { account: string; device: string } }) {
     return this.locked(async () => {
-      try { await this.syncInner(f.groupId); await this.c.flush(); }
+      if (f.resync && typeof f.resync.account === 'string' && typeof f.resync.device === 'string') this.mls.noteResync(f.groupId, f.resync.account, f.resync.device);
+      try { await this.syncInner(f.groupId, !!f.resync); await this.c.flush(); }
       catch (e) { this.c.onError(e); }
       finally { this.c.ack(f.id); } // events are idempotent; syncAll repairs a failed one on reconnect
     });

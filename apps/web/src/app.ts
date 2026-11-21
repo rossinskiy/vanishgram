@@ -986,6 +986,19 @@ export function startApp(root: HTMLElement, client: VanishClient, api: AccountsA
   void client.profile.blocked().then((ids) => { client.blockedSet = new Set(ids); }).catch(() => {});
   void connect();
 
+  // Moving chats between devices: an older device of this account approves, a new one asks once after signing in with the phrase.
+  client.history.onRequest = (req, approve) => {
+    void confirmModal('Send your chat history?', `"${req.label}" signed in to your account and asks for your chats. Only approve if that is you. The history travels encrypted and never leaves your devices unencrypted.`, 'Send', false).then(async (yes) => {
+      if (!yes) return;
+      try { await approve(); toast('History sent.'); } catch { toast('Could not send the history.'); }
+    });
+  };
+  client.history.onImported = (n) => toast(n ? `Copied ${n} messages from your other device.` : 'Your other device had nothing new to copy.');
+  if (client.wantHistory) {
+    client.wantHistory = false;
+    void client.history.request().then((n) => { if (n) toast('To copy your chats: open Vanishgram on your other device and approve.'); }).catch(() => {});
+  }
+
   if (joinLink && joinLink.includes('#channel=')) {
     const name = /#channel=([a-z0-9_]+)/i.exec(joinLink)?.[1];
     if (name) void client.ch.lookup(name).then((ch) => open(`c:${ch.id}`)).catch(() => toast('Channel not found.'));

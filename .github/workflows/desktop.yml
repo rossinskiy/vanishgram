@@ -15,7 +15,8 @@ jobs:
         include:
           - { os: windows-latest, script: dist:win }
           - { os: ubuntu-latest, script: dist:linux }
-          - { os: macos-latest, script: dist:mac }
+          - { os: macos-latest, script: dist:mac, tag: arm64 }
+          - { os: macos-latest, script: 'dist:mac:x64', tag: x64 }
     runs-on: ${{ matrix.os }}
     timeout-minutes: 30
     steps:
@@ -30,9 +31,11 @@ jobs:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
         with:
-          name: vanishgram-${{ matrix.os }}
+          name: vanishgram-${{ matrix.os }}-${{ matrix.tag || 'x' }}
           path: |
             apps/desktop/dist/Vanishgram-*.exe
             apps/desktop/dist/Vanishgram-*.AppImage
             apps/desktop/dist/Vanishgram-*.dmg
+            apps/desktop/dist/Vanishgram-*.blockmap
+            apps/desktop/dist/latest*.yml
           if-no-files-found: error
