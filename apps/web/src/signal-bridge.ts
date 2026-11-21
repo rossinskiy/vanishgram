@@ -4,7 +4,7 @@
 import type { SignalProvider, RemoteBundle, Ciphertext, PrekeyWire, SignedPrekeyWire } from '@vanishgram/client-core';
 
 interface Bridge { open(): Promise<number>; call(handle: number, method: string, args: unknown[]): Promise<any>; close(handle: number): Promise<void> }
-interface Cap { isNativePlatform?(): boolean; Plugins?: Record<string, any>; registerPlugin?<T>(name: string): T }
+interface Cap { isNativePlatform?(): boolean; Plugins?: Record<string, any> }
 declare global { interface Window { vgSignal?: Bridge; Capacitor?: Cap } }
 
 // Phone app: bytes cross the Capacitor bridge as {"$u8": base64}, and each result comes back wrapped as JSON {"v": ...}.
@@ -15,8 +15,10 @@ const dec = (_k: string, v: any) => (v && typeof v === 'object' && typeof v.$u8 
 
 function capacitorBridge(): Bridge | null {
   const cap = window.Capacitor;
-  if (!cap?.isNativePlatform?.() || !cap.registerPlugin) return null;
-  const p = cap.registerPlugin<{ open(): Promise<{ handle: number }>; call(o: { handle: number; method: string; args: string }): Promise<{ result: string }>; close(o: { handle: number }): Promise<void> }>('VgSignal');
+  if (!cap?.isNativePlatform?.()) return null;
+  // The shell injects window.Capacitor with a Plugins table holding every native plugin that was registered at build time.
+  const p = cap.Plugins?.VgSignal as { open(): Promise<{ handle: number }>; call(o: { handle: number; method: string; args: string }): Promise<{ result: string }>; close(o: { handle: number }): Promise<void> } | undefined;
+  if (!p) return null;
   return {
     open: async () => (await p.open()).handle,
     call: async (handle, method, args) => JSON.parse((await p.call({ handle, method, args: JSON.stringify(args, enc) })).result, dec).v,
