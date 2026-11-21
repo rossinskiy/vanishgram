@@ -148,8 +148,11 @@ jobs:
         working-directory: apps/mobile/ios/App
         run: |
           DEVICE=$(xcrun simctl list devices available | grep -m1 -E "iPhone" | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
-          xcrun simctl boot "$DEVICE"
-          xcrun simctl bootstatus "$DEVICE" -b
+          for attempt in 1 2 3; do
+            xcrun simctl boot "$DEVICE" || true
+            xcrun simctl bootstatus "$DEVICE" -b && break
+            xcrun simctl shutdown "$DEVICE" || true
+          done
           xcrun simctl install "$DEVICE" build/sim/Build/Products/Debug-iphonesimulator/App.app
           (xcrun simctl launch --console --terminate-running-process "$DEVICE" win.karatel.vanishgram -vg-selftest > selftest.log 2>&1 &)
           for i in $(seq 1 60); do grep -q "VGSELFTEST" selftest.log && break; sleep 2; done

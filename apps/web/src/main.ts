@@ -7,7 +7,7 @@ import { startAuth } from './auth.ts';
 import { startApp } from './app.ts';
 import { avatarEl, askSecondFactor, uaLabel } from './profile-ui.ts';
 import { notify } from './notify.ts';
-import { BASE, page } from './auth.ts';
+import { BASE, page, inApp } from './auth.ts';
 import { passwordField, modal } from './dom.ts';
 import type { AccountsApi, AccountEntry } from './accounts.ts';
 
@@ -103,6 +103,9 @@ window.vgDesktop?.onUpdate?.((m) => {
     h('button', { class: 'btn secondary', type: 'button', onClick: () => bar.remove() }, 'Later'));
   document.body.prepend(bar);
 });
+// Phone app: the Android back button closes dialogs and chats first, and only then sends the app to the background.
+const capApp = window.Capacitor?.Plugins?.App;
+capApp?.addListener?.('backButton', () => { if (!window.vgBack?.()) void capApp.minimizeApp?.(); });
 window.vgDesktop?.onLink((frag) => { pending = 'https://vanishgram.karatel.win/' + frag; if (activeId) show(activeId); });
 
 function show(id: string) {
@@ -141,7 +144,7 @@ function boot() {
 function notice() {
   try { if (localStorage.getItem('vg.notice') === '1') return; } catch { return; }
   const bar = h('div', { class: 'cookie', role: 'region', 'aria-label': 'Storage notice' },
-    h('span', { class: 'grow' }, 'No tracking cookies. This site stores your theme and your encrypted account data in your browser only. ', h('a', { href: page('/privacy') }, 'Details')),
+    h('span', { class: 'grow' }, (inApp ? 'No tracking. This app stores your theme and your encrypted account data on this device only. ' : 'No tracking cookies. This site stores your theme and your encrypted account data in your browser only. '), h('a', { href: page('/privacy') }, 'Details')),
     h('button', { class: 'btn secondary', type: 'button', onClick: () => { try { localStorage.setItem('vg.notice', '1'); } catch { /* ignore */ } bar.remove(); } }, 'OK'));
   document.body.append(bar);
 }

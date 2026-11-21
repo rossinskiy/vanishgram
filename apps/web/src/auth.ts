@@ -3,7 +3,7 @@ import { h, passwordField, copyText, confirmModal, icon } from './dom.ts';
 import { askSecondFactor } from './profile-ui.ts';
 
 /** The API origin. In the desktop and phone apps the page comes from the app itself, so the server address is fixed. */
-const inApp = location.protocol === 'app:' || location.protocol === 'capacitor:' || !!window.Capacitor?.isNativePlatform?.();
+export const inApp = location.protocol === 'app:' || location.protocol === 'capacitor:' || !!window.Capacitor?.isNativePlatform?.();
 export const BASE = inApp ? 'https://vanishgram.karatel.win' : location.origin;
 /** Links to the site's own pages (privacy, terms): absolute inside the apps, where there is no site to resolve them against. */
 export const page = (path: string) => (inApp ? BASE + path : path);

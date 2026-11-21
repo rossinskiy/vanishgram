@@ -7,6 +7,8 @@ import type { CallState } from '@vanishgram/client-core';
 import { avatarEl, colorClass, editProfileDialog, privacyDialog, securityDialog, devicesDialog, reportDialog } from './profile-ui.ts';
 import type { AccountsApi } from './accounts.ts';
 import { BASE, page } from './auth.ts';
+
+declare global { interface Window { vgBack?: () => boolean } }
 import { getPrefs, setPrefs, enableNotifications, notify, notificationsSupported, type NotifyMode } from './notify.ts';
 import { showMenu } from './menus.ts';
 import { attachmentNode, sendFiles, uploads, uploadNode, onUploadsChange, Recorder, fmtDur } from './media.ts';
@@ -265,6 +267,13 @@ export function startApp(root: HTMLElement, client: VanishClient, api: AccountsA
     if (focus) setTimeout(() => scrollToMessage(focus), 60); else textarea?.focus();
   }
   function closeChat() { if (active && textarea) client.x.setDraft(active, textarea.value); active = null; app.classList.remove('open-chat'); renderPane(); renderList(); }
+  // Phone back button (Android): close the open dialog first, then go from a chat back to the list. Returns true when it handled the press.
+  window.vgBack = () => {
+    const dlg = document.querySelector<HTMLDialogElement>('dialog[open]');
+    if (dlg) { dlg.close(); return true; }
+    if (matchMedia('(max-width: 800px)').matches && app.classList.contains('open-chat')) { closeChat(); return true; }
+    return false;
+  };
 
   function scrollToMessage(id: string) {
     const el = log?.querySelector<HTMLElement>(`[data-mid="${CSS.escape(id)}"]`);
