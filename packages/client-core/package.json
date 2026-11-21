@@ -13,7 +13,7 @@
   "dependencies": {
     "@hpke/hybridkem-x-wing": "^0.7.0",
     "@noble/ciphers": "^2.0.0",
-    "@noble/curves": "^2.0.0",
+    "@noble/curves": "^2.4.0",
     "@noble/hashes": "^2.0.0",
     "@scure/bip39": "^2.0.0",
     "@serenity-kit/opaque": "^1.1.0",
