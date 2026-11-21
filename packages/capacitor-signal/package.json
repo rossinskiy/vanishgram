@@ -1,6 +1,6 @@
 {
   "name": "@vanishgram/capacitor-signal",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "private": true,
   "description": "Native libsignal bridge for the Vanishgram phone apps (Android and iOS)",
   "license": "AGPL-3.0-only",

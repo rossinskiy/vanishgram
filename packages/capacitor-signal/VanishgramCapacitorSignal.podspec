@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name = 'VanishgramCapacitorSignal'
-  s.version = '0.1.2'
+  s.version = '0.1.3'
   s.summary = 'Native libsignal bridge for the Vanishgram phone apps'
   s.license = 'AGPL-3.0-only'
   s.homepage = 'https://github.com/rossinskiy/vanishgram'
