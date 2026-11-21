@@ -12,6 +12,15 @@ public class VgSignalPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "close", returnType: CAPPluginReturnPromise),
     ]
 
+    /// Called by Capacitor when the plugin is created. Runs the engine self-check only under the -vg-selftest launch argument (CI).
+    override public func load() {
+        guard ProcessInfo.processInfo.arguments.contains("-vg-selftest") else { return }
+        DispatchQueue.global().async {
+            do { try SelfTest.run(); print("VGSELFTEST OK") } catch { print("VGSELFTEST FAIL \(error)") }
+            fflush(stdout)
+        }
+    }
+
     private let queue = DispatchQueue(label: "win.karatel.vanishgram.signal")
     private var engines: [Int: SignalEngine] = [:]
     private var next = 1

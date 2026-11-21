@@ -109,3 +109,38 @@ jobs:
         with:
           name: android-test-report
           path: apps/mobile/android/app/build/reports/androidTests
+  ios-test:
+    # Runs the app in the iOS simulator and checks the native libsignal engine through the same JSON bridge the page uses.
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      LIBSIGNAL_FFI_PREBUILD_CHECKSUM: a3df979aa39b307ac4ef0f3fd59536daab5d6b3f8257c7aefe5f0470625f2582
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @vanishgram/web
+      - run: npm run sync:ios -w @vanishgram/mobile
+      - name: Install pods
+        working-directory: apps/mobile/ios/App
+        run: pod install
+      - name: Build for the simulator
+        working-directory: apps/mobile/ios/App
+        run: |
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' -derivedDataPath build/sim \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" ARCHS=arm64 ONLY_ACTIVE_ARCH=NO build
+      - name: Run the self-check
+        working-directory: apps/mobile/ios/App
+        run: |
+          DEVICE=$(xcrun simctl list devices available | grep -m1 -E "iPhone" | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          xcrun simctl boot "$DEVICE"
+          xcrun simctl bootstatus "$DEVICE" -b
+          xcrun simctl install "$DEVICE" build/sim/Build/Products/Debug-iphonesimulator/App.app
+          (xcrun simctl launch --console --terminate-running-process "$DEVICE" win.karatel.vanishgram -vg-selftest > selftest.log 2>&1 &)
+          for i in $(seq 1 60); do grep -q "VGSELFTEST" selftest.log && break; sleep 2; done
+          cat selftest.log
+          grep -q "VGSELFTEST OK" selftest.log
