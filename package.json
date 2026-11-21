@@ -12,7 +12,7 @@
     "build:web": "npm run build -w @vanishgram/web"
   },
   "devDependencies": {
-    "@types/node": "^24.0.0",
+    "@types/node": "^26.6.6",
     "@types/ws": "^8.5.0",
     "typescript": "^5.9.0"
   }
