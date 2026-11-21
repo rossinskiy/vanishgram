@@ -6,7 +6,7 @@ import { createWebPeerFactory, callsSupported, listAudioDevices, setSpeaker, cur
 import type { CallState } from '@vanishgram/client-core';
 import { avatarEl, colorClass, editProfileDialog, privacyDialog, securityDialog, devicesDialog, reportDialog } from './profile-ui.ts';
 import type { AccountsApi } from './accounts.ts';
-import { BASE } from './auth.ts';
+import { BASE, page } from './auth.ts';
 import { getPrefs, setPrefs, enableNotifications, notify, notificationsSupported, type NotifyMode } from './notify.ts';
 import { showMenu } from './menus.ts';
 import { attachmentNode, sendFiles, uploads, uploadNode, onUploadsChange, Recorder, fmtDur } from './media.ts';
@@ -225,7 +225,7 @@ export function startApp(root: HTMLElement, client: VanishClient, api: AccountsA
         api.canAdd() ? item('plus', `Add account (${api.entries().length} of ${api.max})`, () => api.add()) : null,
         item('settings', 'Settings', openSettings),
         h('button', { class: 'drawer-item', type: 'button', onClick: () => { toggleTheme(); const on = currentTheme() === 'dark'; sw.classList.toggle('on', on); sw.setAttribute('aria-checked', String(on)); } }, icon(dark ? 'moon' : 'sun'), h('span', { class: 'grow' }, 'Night mode'), sw)),
-      h('div', { class: 'drawer-foot muted small' }, 'Vanishgram, end-to-end encrypted. ', h('a', { href: '/privacy', target: '_blank', rel: 'noopener' }, 'Privacy'), ' · ', h('a', { href: '/terms', target: '_blank', rel: 'noopener' }, 'Terms')));
+      h('div', { class: 'drawer-foot muted small' }, 'Vanishgram, end-to-end encrypted. ', h('a', { href: page('/privacy'), target: '_blank', rel: 'noopener' }, 'Privacy'), ' · ', h('a', { href: page('/terms'), target: '_blank', rel: 'noopener' }, 'Terms')));
     const overlay = h('div', { class: 'drawer-overlay', onMousedown: (e: Event) => { if (e.target === overlay) close(); } }, panel);
     document.body.append(overlay);
     requestAnimationFrame(() => overlay.classList.add('open'));
@@ -918,7 +918,7 @@ export function startApp(root: HTMLElement, client: VanishClient, api: AccountsA
             try { await client.http('DELETE', '/v1/account'); await new IdbBackend(me).remove(); client.close(); m.close(); onLogout(); } catch { toast('Could not delete the account.'); }
           }
         } }, 'Delete account'),
-        h('p', { class: 'muted small' }, h('a', { href: '/privacy', target: '_blank', rel: 'noopener' }, 'Privacy Policy'), ' · ', h('a', { href: '/terms', target: '_blank', rel: 'noopener' }, 'Terms and Conditions'))),
+        h('p', { class: 'muted small' }, h('a', { href: page('/privacy'), target: '_blank', rel: 'noopener' }, 'Privacy Policy'), ' · ', h('a', { href: page('/terms'), target: '_blank', rel: 'noopener' }, 'Terms and Conditions'))),
       h('button', { class: 'btn secondary block mt14', type: 'button', onClick: () => m.close() }, 'Close'),
     ]);
   }

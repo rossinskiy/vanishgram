@@ -18,6 +18,7 @@ function start(send) {
   const { autoUpdater } = require('electron-updater');
   autoUpdater.autoDownload = false; autoUpdater.autoInstallOnAppQuit = true; autoUpdater.allowDowngrade = false; autoUpdater.allowPrerelease = false;
   autoUpdater.forceDevUpdateConfig = !app.isPackaged;
+  if (!app.isPackaged && process.env.VG_UPDATE_DEBUG) autoUpdater.logger = console;
   autoUpdater.setFeedURL({ provider: 'generic', url: BASE });
   let signed = null, busy = false;
 

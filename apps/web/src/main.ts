@@ -7,7 +7,7 @@ import { startAuth } from './auth.ts';
 import { startApp } from './app.ts';
 import { avatarEl, askSecondFactor, uaLabel } from './profile-ui.ts';
 import { notify } from './notify.ts';
-import { BASE } from './auth.ts';
+import { BASE, page } from './auth.ts';
 import { passwordField, modal } from './dom.ts';
 import type { AccountsApi, AccountEntry } from './accounts.ts';
 
@@ -141,7 +141,7 @@ function boot() {
 function notice() {
   try { if (localStorage.getItem('vg.notice') === '1') return; } catch { return; }
   const bar = h('div', { class: 'cookie', role: 'region', 'aria-label': 'Storage notice' },
-    h('span', { class: 'grow' }, 'No tracking cookies. This site stores your theme and your encrypted account data in your browser only. ', h('a', { href: '/privacy' }, 'Details')),
+    h('span', { class: 'grow' }, 'No tracking cookies. This site stores your theme and your encrypted account data in your browser only. ', h('a', { href: page('/privacy') }, 'Details')),
     h('button', { class: 'btn secondary', type: 'button', onClick: () => { try { localStorage.setItem('vg.notice', '1'); } catch { /* ignore */ } bar.remove(); } }, 'OK'));
   document.body.append(bar);
 }

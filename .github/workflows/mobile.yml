@@ -1,0 +1,75 @@
+name: mobile
+# Builds the phone apps. Nothing is signed here: signing keys live on the maintainer's computer, never in CI.
+# Run from the Actions tab (workflow_dispatch) or push a tag like v0.1.1.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - run: npm ci
+      - run: npm run build -w @vanishgram/web
+      - run: npm run sync:android -w @vanishgram/mobile
+      - name: Version
+        run: echo "VG_VERSION_NAME=$(node -p "require('./apps/mobile/package.json').version")" >> "$GITHUB_ENV"
+      - name: Build release bundle and APK
+        working-directory: apps/mobile/android
+        run: ./gradlew --no-daemon bundleRelease assembleRelease
+        env:
+          VG_VERSION_CODE: ${{ github.run_number }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vanishgram-android
+          path: |
+            apps/mobile/android/app/build/outputs/bundle/release/*.aab
+            apps/mobile/android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+  ios:
+    # An unsigned .ipa for installing with AltStore, Sideloadly or similar tools, which sign it with the user's own Apple ID.
+    runs-on: macos-latest
+    timeout-minutes: 60
+    env:
+      # sha256 of libsignal-client-ios-build-v0.86.5.tar.gz from build-artifacts.signal.org (the prebuilt native library, pinned)
+      LIBSIGNAL_FFI_PREBUILD_CHECKSUM: a3df979aa39b307ac4ef0f3fd59536daab5d6b3f8257c7aefe5f0470625f2582
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run build -w @vanishgram/web
+      - run: npm run sync:ios -w @vanishgram/mobile
+      - name: Install pods
+        working-directory: apps/mobile/ios/App
+        run: pod install
+      - name: Build without signing
+        working-directory: apps/mobile/ios/App
+        run: |
+          VERSION=$(node -p "require('../../package.json').version")
+          xcodebuild -workspace App.xcworkspace -scheme App -configuration Release -sdk iphoneos \
+            -destination 'generic/platform=iOS' -archivePath build/App.xcarchive \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            MARKETING_VERSION="$VERSION" CURRENT_PROJECT_VERSION="${{ github.run_number }}" archive
+          rm -rf Payload && mkdir Payload
+          cp -R build/App.xcarchive/Products/Applications/App.app Payload/
+          zip -qry "Vanishgram-$VERSION-unsigned.ipa" Payload
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vanishgram-ios
+          path: apps/mobile/ios/App/Vanishgram-*.ipa
+          if-no-files-found: error

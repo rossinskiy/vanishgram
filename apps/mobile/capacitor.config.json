@@ -1,0 +1,9 @@
+{
+  "appId": "win.karatel.vanishgram",
+  "appName": "Vanishgram",
+  "webDir": "www",
+  "server": { "hostname": "app.vanishgram.invalid", "androidScheme": "https", "iosScheme": "capacitor", "cleartext": false },
+  "android": { "allowMixedContent": false, "webContentsDebuggingEnabled": false },
+  "ios": { "contentInset": "never" },
+  "plugins": { "StatusBar": { "style": "DEFAULT", "backgroundColor": "#2563EB" } }
+}

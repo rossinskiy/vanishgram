@@ -2,12 +2,15 @@ import { VanishClient, IdbBackend, newMnemonic, isValidMnemonic, normalizeMnemon
 import { h, passwordField, copyText, confirmModal, icon } from './dom.ts';
 import { askSecondFactor } from './profile-ui.ts';
 
-/** The API origin. In the desktop app the page itself comes from app://vanishgram, so the server address is fixed. */
-export const BASE = location.protocol === 'app:' ? 'https://vanishgram.karatel.win' : location.origin;
+/** The API origin. In the desktop and phone apps the page comes from the app itself, so the server address is fixed. */
+const inApp = location.protocol === 'app:' || location.protocol === 'capacitor:' || !!window.Capacitor?.isNativePlatform?.();
+export const BASE = inApp ? 'https://vanishgram.karatel.win' : location.origin;
+/** Links to the site's own pages (privacy, terms): absolute inside the apps, where there is no site to resolve them against. */
+export const page = (path: string) => (inApp ? BASE + path : path);
 
 const year = new Date().getFullYear();
 const footer = () => h('footer', { class: 'foot' },
-  h('a', { href: '/privacy' }, 'Privacy Policy'), h('a', { href: '/terms' }, 'Terms and Conditions'),
+  h('a', { href: page('/privacy') }, 'Privacy Policy'), h('a', { href: page('/terms') }, 'Terms and Conditions'),
   h('div', {}, `© ${year} Vanishgram`));
 
 const brand = () => h('div', { class: 'brand' }, h('img', { src: '/favicon.svg', alt: '', width: '40', height: '40' }), h('span', {}, 'Vanishgram'));

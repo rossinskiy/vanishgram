@@ -2,8 +2,3 @@ node_modules
 *.db
 *.db-*
 .env
-dist
-dist-downloads
-apps/desktop/app
-apps/desktop/signal-engine.mjs
-*.tsbuildinfo
