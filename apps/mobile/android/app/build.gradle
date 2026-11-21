@@ -7,8 +7,8 @@ android {
         applicationId "win.karatel.vanishgram"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (System.getenv("VG_VERSION_CODE") ?: "1").toInteger()
-        versionName (System.getenv("VG_VERSION_NAME") ?: "0.1.1")
+        versionCode = Integer.parseInt(System.getenv("VG_VERSION_CODE") ?: "1")
+        versionName = System.getenv("VG_VERSION_NAME") ?: "0.1.1"
         ndk { abiFilters "arm64-v8a", "armeabi-v7a" }
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {

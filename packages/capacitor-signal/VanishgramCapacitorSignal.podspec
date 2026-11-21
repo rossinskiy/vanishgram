@@ -11,4 +11,9 @@ Pod::Spec.new do |s|
   s.dependency 'Capacitor'
   s.dependency 'LibSignalClient'
   s.swift_version = '5.1'
+  # LibSignalClient imports the C module SignalFfi; the pods that import LibSignalClient need to see it too.
+  s.pod_target_xcconfig = {
+    'HEADER_SEARCH_PATHS' => '$(inherited) "${PODS_ROOT}/LibSignalClient/swift/Sources/SignalFfi"',
+    'SWIFT_INCLUDE_PATHS' => '$(inherited) "${PODS_ROOT}/LibSignalClient/swift/Sources/SignalFfi"'
+  }
 end
