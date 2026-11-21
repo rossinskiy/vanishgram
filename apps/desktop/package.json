@@ -1,0 +1,93 @@
+{
+  "name": "@vanishgram/desktop",
+  "productName": "Vanishgram",
+  "version": "0.1.0",
+  "description": "Vanishgram desktop messenger",
+  "author": "Vanishgram contributors",
+  "homepage": "https://vanishgram.karatel.win",
+  "license": "AGPL-3.0-only",
+  "private": true,
+  "main": "main.cjs",
+  "scripts": {
+    "prepare-app": "npm run build -w @vanishgram/web && node scripts/prepare.mjs",
+    "start": "npm run prepare-app && electron .",
+    "dist": "npm run prepare-app && electron-builder",
+    "dist:win": "npm run prepare-app && electron-builder --win",
+    "dist:linux": "npm run prepare-app && electron-builder --linux",
+    "dist:mac": "npm run prepare-app && electron-builder --mac"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "electron": "45.4.1",
+    "electron-builder": "^26.0.0",
+    "esbuild": "^0.25.0",
+    "png-to-ico": "^2.1.8"
+  },
+  "build": {
+    "appId": "win.karatel.vanishgram",
+    "productName": "Vanishgram",
+    "copyright": "Vanishgram contributors",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.cjs",
+      "preload.cjs",
+      "signal-engine.mjs",
+      "app/**",
+      "build/icon.png",
+      "package.json"
+    ],
+    "artifactName": "Vanishgram-${version}-${os}-${arch}.${ext}",
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "deleteAppDataOnUninstall": false
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Network",
+      "icon": "build/icon.png",
+      "maintainer": "Vanishgram contributors <noreply@vanishgram.karatel.win>",
+      "executableName": "vanishgram",
+      "syncDesktopName": true
+    },
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "category": "public.app-category.social-networking",
+      "identity": null
+    },
+    "protocols": [
+      {
+        "name": "Vanishgram",
+        "schemes": [
+          "vanishgram"
+        ]
+      }
+    ],
+    "asarUnpack": [
+      "**/node_modules/@signalapp/**"
+    ]
+  },
+  "desktopName": "vanishgram.desktop",
+  "dependencies": {
+    "@signalapp/libsignal-client": "0.108.5"
+  }
+}

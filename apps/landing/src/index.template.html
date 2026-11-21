@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Vanishgram: a private messenger with no phone number</title>
+  <meta name="description" content="Vanishgram is an end-to-end encrypted messenger for Windows, macOS and Linux. Sign up with 12 words, no phone number and no email. The server only holds ciphertext until it is delivered.">
+  <meta name="theme-color" content="#2563EB">
+  <meta name="robots" content="index,follow">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="canonical" href="https://vanishgram.karatel.win/">
+  <meta property="og:title" content="Vanishgram: a private messenger with no phone number">
+  <meta property="og:description" content="End-to-end encrypted chats, groups, channels and calls. Sign up with 12 words. Desktop app for Windows, macOS and Linux.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://vanishgram.karatel.win/">
+  <link rel="stylesheet" href="/landing.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="bar" id="bar" aria-hidden="true"></div>
+
+  <div class="invite" id="invite" role="region" aria-label="Invite link">
+    <div class="wrap"><span>You opened a Vanishgram invite. It opens inside the desktop app.</span><a id="invite-link" href="vanishgram://open">Open in Vanishgram</a></div>
+  </div>
+
+  <header class="top">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="Vanishgram home"><img src="/favicon.svg" alt="" width="32" height="32">Vanishgram</a>
+      <button class="icon-btn menu-btn" id="menu-btn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="nav" id="nav" aria-label="Main">
+        <a href="#features">Features</a>
+        <a href="#security">Security</a>
+        <a href="#download">Download</a>
+        <a href="#faq">FAQ</a>
+        <button class="icon-btn" id="theme-btn" type="button" aria-label="Switch between light and dark theme">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="h-hero">
+      <div class="wrap">
+        <div>
+          <span class="eyebrow">Early version {{VERSION}}</span>
+          <h1 id="h-hero">A messenger that cannot read your messages</h1>
+          <p class="lead">Sign up with 12 words. No phone number, no email, no real name. Chats, groups, channels and voice calls are encrypted on your device before they leave it.</p>
+          <div class="cta">{{HERO_BUTTON}}<a class="btn ghost" href="#security">How it protects you</a></div>
+          <p class="fine">Free. The client is open source (GPL). Windows, macOS and Linux.</p>
+        </div>
+        <div class="phone" aria-hidden="true">
+          <div class="phone-top"><span class="av">M</span><div><b>Mira</b><span>online</span></div></div>
+          <p class="bub in">Did the key check out?</p>
+          <p class="bub out">Safety numbers match. We are good.</p>
+          <p class="bub in">Then send me the file.</p>
+          <p class="bub out">Sending. It leaves my device already encrypted.</p>
+          <div class="lock"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>End-to-end encrypted</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" aria-labelledby="h-features">
+      <div class="wrap">
+        <div class="sec-head"><h2 id="h-features">What you get</h2><p>The basics of a modern messenger, built around not trusting the server.</p></div>
+        <div class="grid">
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg></div><h3>Anonymous accounts</h3><p>Your account is 12 words generated on your device. Nothing to link to your phone or inbox. Lose the words and the account is gone: there is no reset by design.</p></article>
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div><h3>Encrypted on your device</h3><p>Chats use the Signal protocol from the official libsignal library, with post-quantum key agreement. Keys change with each message. The server stores only ciphertext until the other device confirms delivery, then deletes it.</p></article>
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></div><h3>Delete for everyone</h3><p>Remove a message from both sides, including any copy still waiting on the server. Disappearing-message timers are agreed by both people in the chat.</p></article>
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><circle cx="17" cy="9" r="2.5"/><path d="M2 20a7 7 0 0 1 14 0M16 14.5a5 5 0 0 1 6 5"/></svg></div><h3>Groups and channels</h3><p>Group chats use MLS, the IETF standard for group encryption: keys change whenever someone joins or leaves, and a removed member reads nothing after that. Channels for broadcasting, public or private.</p></article>
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg></div><h3>Voice calls</h3><p>Calls are encrypted between the two devices. Both screens show a short code derived from the call keys: read it aloud to rule out a middleman.</p></article>
+          <article class="card"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Two-step verification</h3><p>Add an authenticator app and a cloud password. The password is checked with OPAQUE, so the server never receives it or anything that can be tested offline.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="security" class="alt" aria-labelledby="h-sec">
+      <div class="wrap">
+        <div class="sec-head"><h2 id="h-sec">Honest about what the server sees</h2><p>Privacy claims are only worth something when they include the limits.</p></div>
+        <div class="two">
+          <div><h3>The server cannot see</h3>
+            <ul class="list">
+              <li>Message text, files and call audio.</li>
+              <li>Your 12 words or your private keys.</li>
+              <li>Group names, descriptions and pinned messages.</li>
+              <li>Your phone number or email: it never has them.</li>
+            </ul></div>
+          <div><h3>The server can see</h3>
+            <ul class="list no">
+              <li>Who messages whom, when, and roughly how big the message is.</li>
+              <li>Your usernames, group member lists and device list.</li>
+              <li>Your IP address while connected (and Cloudflare, which hosts the site, sees it too).</li>
+              <li>Public channel posts, which are public by design.</li>
+            </ul></div>
+        </div>
+        <p class="notice mt-lg"><strong>Early software.</strong> The encryption follows established designs but has not been independently audited. Do not rely on it where your safety depends on it. Read the <a href="/privacy.html">privacy policy</a>.</p>
+      </div>
+    </section>
+
+    <section id="download" aria-labelledby="h-dl">
+      <div class="wrap">
+        <div class="sec-head"><h2 id="h-dl">Download</h2><p>The app runs the interface from inside the installer, so the website cannot change the code that handles your keys. Check the SHA-256 below against the file you downloaded.</p></div>
+        <div class="dl-grid">{{DOWNLOAD_CARDS}}</div>
+        <p class="fine mt"><strong>First launch.</strong> The installers are not signed with a paid certificate yet. On Windows, SmartScreen may say the app is unrecognised: choose More info, then Run anyway. On macOS, right-click the app and choose Open the first time. On Linux, make the file executable and run it.</p>
+      </div>
+    </section>
+
+    <section id="faq" class="alt" aria-labelledby="h-faq">
+      <div class="wrap">
+        <div class="sec-head"><h2 id="h-faq">Questions</h2></div>
+        <details><summary>Why is there no web version?</summary><p>A website can change its code every time you open it, and that code would hold your keys. The desktop app ships its interface inside the installer, so what runs on your computer is what you downloaded.</p></details>
+        <details><summary>What if I lose my 12 words?</summary><p>The account cannot be recovered. A reset path would also be a way in for anyone else, so there is none. Write the words down and keep them somewhere safe. If you are signed in on another device, that device keeps working.</p></details>
+        <details><summary>Does it work on a phone?</summary><p>Not yet. Today it is a desktop app for Windows, macOS and Linux.</p></details>
+        <details><summary>How is it paid for?</summary><p>It is a free project. There is no advertising and no tracking, and nothing is sold.</p></details>
+        <details><summary>Can I read the code?</summary><p>The client, which does all the encryption, is open source under the GPL. The server is not published, which is why the app is built so that the server never needs to be trusted with your content.</p></details>
+        <details><summary>How do I report a security problem?</summary><p>Follow the instructions in the security notes inside the repository: report privately and give steps to reproduce. Please do not run attacks against the live service.</p></details>
+      </div>
+    </section>
+  </main>
+
+  <button class="icon-btn up" id="up" type="button" aria-label="Back to top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+  <footer>
+    <div class="wrap">
+      <span>&copy; <span id="year">{{YEAR}}</span> Vanishgram contributors</span>
+      <nav aria-label="Footer"><a href="/privacy.html">Privacy Policy</a><a href="/terms.html">Terms</a><a href="#download">Download</a><a href="#features">Features</a></nav>
+      <span>Last updated {{UPDATED}}</span>
+    </div>
+  </footer>
+  <script src="/landing.js" defer></script>
+</body>
+</html>

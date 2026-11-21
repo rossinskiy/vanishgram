@@ -1,0 +1,18 @@
+{
+  "name": "@vanishgram/web",
+  "version": "0.0.1",
+  "type": "module",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "@vanishgram/client-core": "*",
+    "@vanishgram/protocol": "*",
+    "qrcode-generator": "^2.0.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

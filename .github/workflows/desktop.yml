@@ -1,0 +1,38 @@
+name: desktop
+# Builds the installers on each OS. macOS and Linux (AppImage) cannot be produced on Windows, so this is how they get built.
+# Run it from the Actions tab (workflow_dispatch) or push a tag like v0.1.0. Download the files from the run's artifacts.
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, script: dist:win }
+          - { os: ubuntu-latest, script: dist:linux }
+          - { os: macos-latest, script: dist:mac }
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run ${{ matrix.script }} -w @vanishgram/desktop
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vanishgram-${{ matrix.os }}
+          path: |
+            apps/desktop/dist/Vanishgram-*.exe
+            apps/desktop/dist/Vanishgram-*.AppImage
+            apps/desktop/dist/Vanishgram-*.dmg
+          if-no-files-found: error

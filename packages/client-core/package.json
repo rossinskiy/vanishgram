@@ -1,0 +1,23 @@
+{
+  "name": "@vanishgram/client-core",
+  "version": "0.0.1",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./node-backend": "./src/node-backend.ts"
+  },
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@hpke/hybridkem-x-wing": "^0.7.0",
+    "@noble/ciphers": "^2.0.0",
+    "@noble/curves": "^2.0.0",
+    "@noble/hashes": "^2.0.0",
+    "@scure/bip39": "^2.0.0",
+    "@serenity-kit/opaque": "^1.1.0",
+    "@vanishgram/protocol": "*",
+    "ts-mls": "^1.6.4"
+  }
+}

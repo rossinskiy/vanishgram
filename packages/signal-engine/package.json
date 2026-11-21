@@ -1,0 +1,16 @@
+{
+  "name": "@vanishgram/signal-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "AGPL-3.0-only",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "dependencies": {
+    "@signalapp/libsignal-client": "^0.108.5",
+    "@vanishgram/client-core": "*"
+  },
+  "scripts": {
+    "test": "node --test test/*.test.ts"
+  }
+}
