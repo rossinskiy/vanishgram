@@ -103,7 +103,7 @@ jobs:
         with:
           api-level: 33
           arch: x86_64
-          script: cd apps/mobile/android && ./gradlew --no-daemon connectedDebugAndroidTest
+          script: cd apps/mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
