@@ -23,7 +23,7 @@
     "electron": "45.4.1",
     "electron-builder": "^26.0.0",
     "esbuild": "^0.25.0",
-    "png-to-ico": "^2.1.8"
+    "png-to-ico": "^3.0.2"
   },
   "build": {
     "appId": "win.karatel.vanishgram",
