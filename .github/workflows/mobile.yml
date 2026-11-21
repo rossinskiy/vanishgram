@@ -103,7 +103,15 @@ jobs:
         with:
           api-level: 33
           arch: x86_64
-          script: cd apps/mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest
+          script: |
+            cd apps/mobile/android && ./gradlew --no-daemon :app:connectedDebugAndroidTest :app:installDebug
+            adb shell am start -n win.karatel.vanishgram/.MainActivity
+            sleep 20
+            adb exec-out screencap -p > ../../../screen-login.png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-screenshot
+          path: screen-login.png
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
