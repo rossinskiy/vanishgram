@@ -9,7 +9,7 @@ import type { AccountsApi } from './accounts.ts';
 import { BASE, page } from './auth.ts';
 
 declare global { interface Window { vgBack?: () => boolean } }
-import { getPrefs, setPrefs, enableNotifications, notify, notificationsSupported, type NotifyMode } from './notify.ts';
+import { getPrefs, setPrefs, enableNotifications, notify, notificationsSupported, nativePush, syncPush, type NotifyMode } from './notify.ts';
 import { showMenu } from './menus.ts';
 import { attachmentNode, sendFiles, uploads, uploadNode, onUploadsChange, Recorder, fmtDur } from './media.ts';
 
@@ -874,14 +874,14 @@ export function startApp(root: HTMLElement, client: VanishClient, api: AccountsA
     const onBox = h('input', { type: 'checkbox', id: 'notif-on', checked: np.on && notificationsSupported });
     const modeSel = h('select', { class: 'input', id: 'notif-mode', disabled: !np.on }, [['hidden', 'Say only "New message"'], ['sender', 'Show who wrote'], ['full', 'Show the message text']].map(([v, t]) => h('option', { value: v }, t)));
     modeSel.value = np.mode;
-    const notifHelp = h('p', { class: 'muted small' }, notificationsSupported ? 'Shown only while a Vanishgram tab is open and not in front. Text is hidden by default because notifications pass through your operating system, outside Vanishgram\'s encryption.' : 'This browser does not support notifications.');
+    const notifHelp = h('p', { class: 'muted small' }, nativePush ? 'Vanishgram keeps a quiet notice in your status bar so it can tell you about new messages while the app is closed. The notification only says that something arrived, because the keys that read messages stay inside the app. No Google or Apple push service is used.' : notificationsSupported ? 'Shown only while a Vanishgram tab is open and not in front. Text is hidden by default because notifications pass through your operating system, outside Vanishgram\'s encryption.' : 'This browser does not support notifications.');
     onBox.addEventListener('change', async () => {
       const want = (onBox as HTMLInputElement).checked;
-      if (want) { const res = await enableNotifications(); if (res !== 'granted') { (onBox as HTMLInputElement).checked = false; toast(res === 'denied' ? 'Notifications are blocked. Allow them in the address bar.' : 'Notifications are not supported here.'); setPrefs({ on: false, mode: modeSel.value as NotifyMode }); modeSel.disabled = true; return; } }
-      setPrefs({ on: want, mode: modeSel.value as NotifyMode }); modeSel.disabled = !want;
+      if (want) { const res = await enableNotifications(); if (res !== 'granted') { (onBox as HTMLInputElement).checked = false; toast(res === 'denied' ? (nativePush ? 'Notifications are blocked. Allow them in the phone settings for Vanishgram.' : 'Notifications are blocked. Allow them in the address bar.') : 'Notifications are not supported here.'); setPrefs({ on: false, mode: modeSel.value as NotifyMode }); modeSel.disabled = true; syncPush(); return; } }
+      setPrefs({ on: want, mode: modeSel.value as NotifyMode }); modeSel.disabled = !want; syncPush();
     });
     modeSel.addEventListener('change', () => setPrefs({ on: (onBox as HTMLInputElement).checked, mode: modeSel.value as NotifyMode }));
-    const notifBox = h('div', { class: 'section' }, h('h3', {}, 'Notifications'), h('label', { class: 'check', for: 'notif-on' }, onBox, h('span', {}, 'Notify me about new messages')), h('div', { class: 'field' }, h('label', { for: 'notif-mode' }, 'What a notification shows'), modeSel), notifHelp);
+    const notifBox = h('div', { class: 'section' }, h('h3', {}, 'Notifications'), h('label', { class: 'check', for: 'notif-on' }, onBox, h('span', {}, 'Notify me about new messages')), h('div', { class: 'field', hidden: nativePush }, h('label', { for: 'notif-mode' }, 'What a notification shows'), modeSel), notifHelp);
     const relayBox = h('div', { class: 'section', hidden: true });
     void client.http<{ relayAvailable: boolean }>('GET', '/v1/calls/ice').then((r) => {
       if (!r.relayAvailable) return;

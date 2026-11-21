@@ -6,7 +6,7 @@ import { initTheme } from './theme.ts';
 import { startAuth } from './auth.ts';
 import { startApp } from './app.ts';
 import { avatarEl, askSecondFactor, uaLabel } from './profile-ui.ts';
-import { notify } from './notify.ts';
+import { notify, setPushSource, syncPush } from './notify.ts';
 import { BASE, page, inApp } from './auth.ts';
 import { passwordField, modal } from './dom.ts';
 import type { AccountsApi, AccountEntry } from './accounts.ts';
@@ -71,7 +71,7 @@ const api: AccountsApi = {
   },
   loggedOut(id) {
     const c = sessions.get(id); c?.close();
-    sessions.delete(id); bgUnread.delete(id); vaultIds = vaultIds.filter((x) => x !== id);
+    sessions.delete(id); bgUnread.delete(id); vaultIds = vaultIds.filter((x) => x !== id); syncPush();
     const labels = readLabels(); delete labels[id]; try { localStorage.setItem(LABELS, JSON.stringify(labels)); } catch { /* ignore */ }
     dispose?.(); dispose = null; activeId = null;
     const next = [...sessions.keys()][0] ?? vaultIds[0];
@@ -80,7 +80,7 @@ const api: AccountsApi = {
   async logoutAll() {
     for (const [id, c] of sessions) { await c.wipe().catch(() => {}); sessions.delete(id); }
     for (const id of vaultIds) await new IdbBackend(id).remove().catch(() => {}); // locked accounts: local data goes, their device entry expires on the server
-    vaultIds = []; bgUnread.clear(); dispose?.(); dispose = null; activeId = null;
+    vaultIds = []; bgUnread.clear(); syncPush(); dispose?.(); dispose = null; activeId = null;
     try { localStorage.removeItem(LABELS); localStorage.removeItem(LAST); } catch { /* ignore */ }
     boot();
   },
@@ -92,7 +92,9 @@ function adopt(c: VanishClient) {
   const id = c.account.accountId;
   sessions.set(id, c);
   if (!vaultIds.includes(id)) vaultIds.push(id);
+  syncPush();
 }
+setPushSource(() => ({ base: BASE, accounts: [...sessions.entries()].filter(([, c]) => c.token).map(([id, c]) => ({ id, label: labelOf(id), token: c.token })) }));
 
 // Desktop app: a vanishgram:// link was opened. Show it in the active account (the link keeps its secret in the fragment only).
 declare global { interface Window { vgDesktop?: { onLink(cb: (frag: string) => void): void; onUpdate?(cb: (m: { state: 'ready'; version: string }) => void): void; installUpdate?(): Promise<void> } } }
